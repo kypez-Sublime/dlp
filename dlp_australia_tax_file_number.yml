@@ -1,17 +1,18 @@
 name: "DLP: Australia Tax File Number"
-description: "Detects messages containing Australian Tax File Numbers (TFN)."
-type: "dlp"
+description: "Detects outbound messages containing validated Australian Tax File Numbers (TFN)."
+type: "query"
 severity: "medium"
-source: |
+authors:
+  - "Security Team"
+expression: |
   type.outbound
-  and any([body.current_thread.text, subject],
-          // TFN: 8 or 9 digits, sometimes with spaces or hyphens
-          regex.contains(., '\b\d{3}[\s\-]?\d{3}[\s\-]?\d{3}\b')
+  and (
+    any(body.current_thread.text_lines, regex.contains(., '\b\d{3}\s?\d{3}\s?\d{2,3}\b'))
+    or regex.contains(subject, '\b\d{3}\s?\d{3}\s?\d{2,3}\b')
   )
-  and any([body.current_thread.text, subject],
-          regex.icontains(., 'tax\s+file\s+number|TFN')
+  and (
+    strings.icontains(body.current_thread.text, 'tax file number')
+    or strings.icontains(body.current_thread.text, 'TFN')
+    or strings.icontains(subject, 'tax file number')
+    or strings.icontains(subject, 'TFN')
   )
-
-detection_methods:
-  - "Content analysis"
-id: "6f995365-e040-5065-b866-df2b4e11b698"
