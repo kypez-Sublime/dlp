@@ -4,11 +4,11 @@ type: "dlp"
 severity: "medium"
 source: |
   type.outbound
-  and any([body.current_thread.text, subject.subject],
+  and any([body.current_thread.text, subject],
           // TFN: 8 or 9 digits, sometimes with spaces or hyphens
           regex.contains(., '\b\d{3}[\s\-]?\d{3}[\s\-]?\d{3}\b')
   )
-  and any([body.current_thread.text, subject.subject],
+  and any([body.current_thread.text, subject],
           regex.icontains(., 'tax\s+file\s+number|TFN')
   )
 
